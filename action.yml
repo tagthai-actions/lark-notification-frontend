@@ -41,7 +41,7 @@ runs:
       id: commit_messages
       shell: bash
       run: |-
-        commit_messages=$(echo '${{ inputs.commit_messages }}' | jq -r '.[].message' | sed 's/^/- /')
+        commit_messages=$(echo '${{ toJson(inputs.commit_messages) }}' | jq -r '.[].message' | sed 's/^/- /')
         commit_messages_json=$(printf "%s\n" "$commit_messages" | jq -Rs 'gsub("- \n-"; "     - ")')
         echo "commit_messages=$commit_messages_json" >> $GITHUB_OUTPUT
 
