@@ -17,19 +17,14 @@ This GitHub Action is designed to send customizable notification messages to Lar
 You can use this action in your GitHub workflow as follows:
 
 ```yaml
-jobs:
-  notify:
-    runs-on: ubuntu-latest
-    needs: set_matrix
-    steps:
-      - name: Send Lark Notification
-        uses: tagthai-actions/lark-notification-frontend@v1
-        with:
-          card_type: matrix
-          service_name: ${{ needs.set_matrix.outputs.environments }} # JSON array e.g. ["content", "mobile"]
-          actor: ${{ github.actor }}
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
+- name: Send Lark Notification
+  uses: tagthai-actions/lark-notification-frontend@v1
+  with:
+    card_type: matrix
+    service_name: ${{ needs.set_matrix.outputs.environments }} # JSON array e.g. ["content", "mobile"]
+    actor: ${{ github.actor }}
+    repository: ${{ github.repository }}
+    ref: ${{ github.ref }}
 ```
 
 ## Inputs
