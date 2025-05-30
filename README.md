@@ -29,14 +29,15 @@ You can use this action in your GitHub workflow as follows:
 
 ## Inputs
 
-| Name           | Required | Description                                                                 |
-|----------------|----------|-----------------------------------------------------------------------------|
-| `card_type`    | Yes      | Either `default` or `matrix`                                                |
-| `service_name` | Yes      | For `default`, it is a string; for `matrix`, a JSON array of module names   |
-| `actor`        | Yes      | GitHub actor who triggered the deployment                                   |
-| `repository`   | Yes      | GitHub repository name                                                      |
-| `ref`          | Yes      | GitHub ref/tag/branch deployed                                              |
-| `tag`          | No       | Optional tag input pipeline                                                 |
+| Name             | Required | Description                                                                 |
+|------------------|----------|-----------------------------------------------------------------------------|
+| `card_type`      | Yes      | Either `default` or `matrix`                                                |
+| `service_name`   | Yes      | For `default`, it is a string; for `matrix`, a JSON array of module names   |
+| `actor`          | Yes      | GitHub actor who triggered the deployment                                   |
+| `repository`     | Yes      | GitHub repository name                                                      |
+| `ref`            | Yes      | GitHub ref/tag/branch deployed                                              |
+| `commit_messages`| No       | Optional commit_messages for develop                                        |
+| `tag`            | No       | Optional tag input pipeline                                                 |
 
 ## Data Source
 
