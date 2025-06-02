@@ -19,11 +19,14 @@ inputs:
     description: "e.g. github.repository"
     required: true
   ref:
-    description: "e.g. github.ref"
+    description: "(require for develop) e.g. github.ref"
     required: false
 
   commit_messages:
     description: "(require for develop) e.g. toJson(github.event.commits)"
+    required: false
+  helm_chart_file_name:
+    description: "(require for default) e.g. helm-chart/release_control_content.csv"
     required: false
   tag:
     description: "(require for default, matrix) e.g. github.event.inputs.tag"
@@ -95,6 +98,7 @@ runs:
         GITHUB_ACTOR: ${{ inputs.actor }}
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         TAG: ${{ inputs.tag }}
+        HELM_CHART_FILE_NAME: ${{ inputs.helm_chart_file_name }}
       run: |-
         service_lists="["
         while read -r line; do
@@ -104,7 +108,7 @@ runs:
             continue
           fi
           service_lists+="{\"service_name\": \"$SERVICE_NAME_VAL\", \"version\": \"$VERSION\"},"
-        done < "helm-chart/release_control_content.csv"
+        done < "$HELM_CHART_FILE_NAME"
         service_lists="${service_lists%,}"
         service_lists+="]"
 
