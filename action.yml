@@ -94,6 +94,7 @@ runs:
       shell: bash
       env:
         SERVICE_NAME: ${{ inputs.service_name }}
+        ENV: ${{ inputs.env }}
         GITHUB_ACTOR: ${{ inputs.actor }}
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         TAG: ${{ inputs.tag }}
@@ -122,7 +123,7 @@ runs:
             "data": {
               "template_id": "ctp_AA48N2uQ1sNH",
               "template_variable": {
-                "env": "UAT",
+                "env": "$ENV",
                 "app_version": "$TAG",
                 "deployer": "$GITHUB_ACTOR",
                 "service_lists": $service_lists
@@ -147,6 +148,7 @@ runs:
       if: inputs.card_type == 'matrix'
       shell: bash
       env:
+        ENV: ${{ inputs.env }}
         GITHUB_ACTOR: ${{ inputs.actor }}
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         ALL_SERVICE: ${{ inputs.service_name }}
@@ -187,7 +189,7 @@ runs:
             "data": {
               "template_id": "ctp_AA48N2uQ1sNH",
               "template_variable": {
-                "env": "UAT",
+                "env": "$ENV",
                 "app_version": "$TAG",
                 "deployer": "$GITHUB_ACTOR",
                 "service_lists": $service_lists
