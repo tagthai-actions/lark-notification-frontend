@@ -187,7 +187,7 @@ runs:
           "card": {
             "type": "template",
             "data": {
-              "template_id": "ctp_AA48N2uQ1sNH",
+              "template_id": "ctp_AAd8OnbKSurj",
               "template_variable": {
                 "env": "$ENV",
                 "app_version": "$TAG",
