@@ -9,6 +9,9 @@ inputs:
       - matrix: Use in UAT/PRD pipelines (with matrix strategy). Supports dynamic module CSVs per module.
     required: true
   
+  env:
+    description: "e.g. DEV, UAT, PRD"
+    required: true
   service_name:
     description: "e.g. github.event.repository.name"
     required: true
@@ -18,18 +21,14 @@ inputs:
   repository:
     description: "e.g. github.repository"
     required: true
-  ref:
-    description: "(require for develop) e.g. github.ref"
-    required: false
-
+  tag:
+    description: "develop use github.ref, default & matrix use github.event.inputs.tag"
+    required: true
   commit_messages:
     description: "(require for develop) e.g. toJson(github.event.commits)"
     required: false
   helm_chart_file_name:
     description: "(require for default) e.g. helm-chart/release_control_content.csv"
-    required: false
-  tag:
-    description: "(require for default, matrix) e.g. github.event.inputs.tag"
     required: false
 
 runs:
@@ -55,7 +54,7 @@ runs:
       env:
         SERVICE_NAME: ${{ inputs.service_name }}
         GITHUB_ACTOR: ${{ inputs.actor }}
-        GITHUB_REF: ${{ inputs.ref }}
+        REF: ${{ inputs.tag }}
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commit_messages }}
       run: |-
@@ -70,7 +69,7 @@ runs:
                 "env": "DEV",
                 "service_name": "$SERVICE_NAME",
                 "deployer": "$GITHUB_ACTOR",
-                "version": "$GITHUB_REF",
+                "version": "$REF",
                 "service_url": "https://github.com/$GITHUB_REPOSITORY",
                 "commit_messages": $COMMIT_MESSAGES
               }
@@ -143,6 +142,7 @@ runs:
 
         echo "Lark response: $RESPONSE"
 
+      # matrix
     - name: (matrix) Notify to Lark
       if: inputs.card_type == 'matrix'
       shell: bash
