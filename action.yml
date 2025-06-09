@@ -57,6 +57,7 @@ runs:
         REF: ${{ inputs.tag }}
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commit_messages }}
+        WEBHOOK_URL: ${{ secrets.LARK_BOT_DEV_WEBHOOK }}
       run: |-
         cat <<EOF > payload.json
         {
@@ -82,7 +83,7 @@ runs:
         cat payload.json
         echo "========================"
 
-        RESPONSE=$(curl -s -X POST "https://open.larksuite.com/open-apis/bot/v2/hook/250af2fe-9532-41d5-bba0-05a1655e45e5" \
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
           -H "Content-Type: application/json" \
           -d @payload.json)
 
@@ -99,6 +100,7 @@ runs:
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         TAG: ${{ inputs.tag }}
         HELM_CHART_FILE_NAME: ${{ inputs.helm_chart_file_name }}
+        WEBHOOK_URL: ${{ secrets.LARK_BOT_UAT_PRD_WEBHOOK }}
       run: |-
         service_lists="["
         while read -r line; do
@@ -146,7 +148,7 @@ runs:
         cat payload.json
         echo "========================"
 
-        RESPONSE=$(curl -s -X POST "https://open.larksuite.com/open-apis/bot/v2/hook/250af2fe-9532-41d5-bba0-05a1655e45e5" \
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
           -H "Content-Type: application/json" \
           -d @payload.json)
 
@@ -162,6 +164,7 @@ runs:
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         ALL_SERVICE: ${{ inputs.service_name }}
         TAG: ${{ inputs.tag }}
+        WEBHOOK_URL: ${{ secrets.LARK_BOT_UAT_PRD_WEBHOOK }}
       run: |-
         echo "$ALL_SERVICE" | jq -c '.' | jq -r '.[]' > modules.txt
 
@@ -221,7 +224,7 @@ runs:
         cat payload.json
         echo "========================"
 
-        RESPONSE=$(curl -s -X POST "https://open.larksuite.com/open-apis/bot/v2/hook/250af2fe-9532-41d5-bba0-05a1655e45e5" \
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
           -H "Content-Type: application/json" \
           -d @payload.json)
 
