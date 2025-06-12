@@ -61,7 +61,7 @@ runs:
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commit_messages }}
         WEBHOOK_URL: ${{ inputs.webhook_token }}
-      run: bash ./scripts/frontend/send_dev_card.sh
+      run: bash scripts/frontend/send_dev_card.sh
       
       # default
     - name: (default) Notify to Lark
