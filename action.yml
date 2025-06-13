@@ -92,7 +92,7 @@ runs:
           -d @payload.json)
 
         echo "Lark response: $RESPONSE"
-      
+        
       # default
     - name: (default) Notify to Lark
       if: inputs.card_type == 'default'
@@ -171,6 +171,7 @@ runs:
         WEBHOOK_URL: ${{ inputs.webhook_token }}
       run: |-
         echo "$ALL_SERVICE" | jq -c '.' | jq -r '.[]' > modules.txt
+
         service_lists="["
         while read -r module; do
           echo "Processing module: $module"
