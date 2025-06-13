@@ -62,7 +62,36 @@ runs:
         COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commit_messages }}
         WEBHOOK_URL: ${{ inputs.webhook_token }}
       working-directory: ${{ github.workspace }}/scripts/frontend
-      run: bash ./send_dev_card.sh
+      run: |-
+        cat <<EOF > payload.json
+        {
+          "msg_type": "interactive",
+          "card": {
+            "type": "template",
+            "data": {
+              "template_id": "ctp_AA4OuaEvBdMQ",
+              "template_variable": {
+                "env": "DEV",
+                "service_name": "$SERVICE_NAME",
+                "deployer": "$GITHUB_ACTOR",
+                "version": "$REF",
+                "service_url": "https://github.com/$GITHUB_REPOSITORY",
+                "commit_messages": $COMMIT_MESSAGES
+              }
+            }
+          }
+        }
+        EOF
+
+        echo "===== Payload JSON ====="
+        cat payload.json
+        echo "========================"
+
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
+          -H "Content-Type: application/json" \
+          -d @payload.json)
+
+        echo "Lark response: $RESPONSE"
       
       # default
     - name: (default) Notify to Lark
@@ -76,7 +105,58 @@ runs:
         TAG: ${{ inputs.tag }}
         HELM_CHART_FILE_NAME: ${{ inputs.helm_chart_file_name }}
         WEBHOOK_URL: ${{ inputs.webhook_token }}
-      run: ./scripts/frontend/send_default_card.sh
+      run: |-
+        service_lists="["
+        while read -r line; do
+          SERVICE_NAME_VAL=$(awk -F, '{print $1}' <<< "$line" | tr -d '[:space:]')
+          VERSION=$(awk -F, '{print $2}' <<< "$line" | tr -d '[:space:]')
+          if [ "$SERVICE_NAME_VAL" == "SERVICE" ]; then
+            continue
+          fi
+          service_lists+="{\"service_name\": \"$SERVICE_NAME_VAL\", \"version\": \"$VERSION\"},"
+        done < "$HELM_CHART_FILE_NAME"
+        service_lists="${service_lists%,}"
+        service_lists+="]"
+
+        echo "Check service_lists."
+        echo $service_lists
+
+        if [ "$ENV" == "UAT" ]; then
+          TEMPLATE_ID="ctp_AA48N2uQ1sNH"
+        elif [ "$ENV" == "PRD" ]; then
+          TEMPLATE_ID="ctp_AAd8OnbKSurj"
+        else
+          echo "Unknown ENV: $ENV"
+          exit 1
+        fi
+
+        cat <<EOF > payload.json
+        {
+          "msg_type": "interactive",
+          "card": {
+            "type": "template",
+            "data": {
+              "template_id": "$TEMPLATE_ID",
+              "template_variable": {
+                "env": "$ENV",
+                "app_version": "$TAG",
+                "deployer": "$GITHUB_ACTOR",
+                "service_lists": $service_lists
+              }
+            }
+          }
+        }
+        EOF
+
+        echo "===== Payload JSON ====="
+        cat payload.json
+        echo "========================"
+
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
+          -H "Content-Type: application/json" \
+          -d @payload.json)
+
+        echo "Lark response: $RESPONSE"
 
       # matrix
     - name: (matrix) Notify to Lark
@@ -89,4 +169,67 @@ runs:
         ALL_SERVICE: ${{ inputs.service_name }}
         TAG: ${{ inputs.tag }}
         WEBHOOK_URL: ${{ inputs.webhook_token }}
-      run: ./scripts/frontend/send_matrix_card.sh
+      run: |-
+        echo "$ALL_SERVICE" | jq -c '.' | jq -r '.[]' > modules.txt
+        service_lists="["
+        while read -r module; do
+          echo "Processing module: $module"
+          if [ ! -f "helm-chart/release_control_admin_web_${module}.csv" ]; then
+            echo "File helm-chart/release_control_admin_web_${module}.csv not found!"
+            continue
+          fi
+
+          while read -r line; do
+            SERVICE_NAME=$(awk -F, '{print $1}' <<< "$line" | tr -d '[:space:]')
+            VERSION=$(awk -F, '{print $2}' <<< "$line" | tr -d '[:space:]')
+            if [ "$SERVICE_NAME" == "SERVICE" ]; then
+              continue
+            fi
+            service_lists+="{\"service_name\": \"$SERVICE_NAME\", \"version\": \"$VERSION\"},"
+          done < "helm-chart/release_control_admin_web_${module}.csv"
+        done < modules.txt
+
+        # Remove trailing comma
+        service_lists="${service_lists%,}"
+        service_lists+="]"
+
+        echo "Check service_lists."
+        echo $service_lists
+
+        if [ "$ENV" == "UAT" ]; then
+          TEMPLATE_ID="ctp_AA48N2uQ1sNH"
+        elif [ "$ENV" == "PRD" ]; then
+          TEMPLATE_ID="ctp_AAd8OnbKSurj"
+        else
+          echo "Unknown ENV: $ENV"
+          exit 1
+        fi
+
+        cat <<EOF > payload.json
+        {
+          "msg_type": "interactive",
+          "card": {
+            "type": "template",
+            "data": {
+              "template_id": "$TEMPLATE_ID",
+              "template_variable": {
+                "env": "$ENV",
+                "app_version": "$TAG",
+                "deployer": "$GITHUB_ACTOR",
+                "service_lists": $service_lists
+              }
+            }
+          }
+        }
+        EOF
+
+        echo "===== Payload JSON ====="
+        cat payload.json
+        echo "========================"
+
+        RESPONSE=$(curl -s -X POST "$WEBHOOK_URL" \
+          -H "Content-Type: application/json" \
+          -d @payload.json)
+
+        echo "Lark response: $RESPONSE"
+
