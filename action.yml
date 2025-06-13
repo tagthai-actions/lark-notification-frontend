@@ -61,7 +61,6 @@ runs:
         GITHUB_REPOSITORY: ${{ inputs.repository }}
         COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commit_messages }}
         WEBHOOK_URL: ${{ inputs.webhook_token }}
-      working-directory: ${{ github.workspace }}/scripts/frontend
       run: |-
         cat <<EOF > payload.json
         {
