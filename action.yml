@@ -40,13 +40,14 @@ runs:
     - name: Install jq
       uses: dcarbone/install-jq-action@v3.1.1
 
-      # Get the GKE credentials so we can deploy to the cluster
-    - name: Get the GKE credentials
-      uses: google-github-actions/get-gke-credentials@v4
+    # Checkout Helm chart repository
+    - name: Checkout Helm chart repository
+      uses: actions/checkout@v4
       with:
-        cluster_name: ${{ env.GKE_CLUSTER }}
-        location: ${{ env.GKE_ZONE }}
-        use_dns_based_endpoint: true
+        repository: TAGTHAi/tgth-helm-chart
+        path: ./helm-chart
+        ref: ${{ env.TAG }}
+        token: ${{ secrets.TGTH_GITHUB_ACCESS_TOKEN }}
 
       # develop 
     - name: (develop) Commit messages to bullet list
