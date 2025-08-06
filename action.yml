@@ -40,6 +40,14 @@ runs:
     - name: Install jq
       uses: dcarbone/install-jq-action@v3.1.1
 
+      # Get the GKE credentials so we can deploy to the cluster
+    - name: Get the GKE credentials
+      uses: google-github-actions/get-gke-credentials@v4
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+        use_dns_based_endpoint: true
+
       # develop 
     - name: (develop) Commit messages to bullet list
       if: inputs.card_type == 'develop'
